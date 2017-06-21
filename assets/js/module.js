@@ -99,6 +99,32 @@ $('#form_login').validate({
 });
 
 
+$('#form_finish_design').validate({
+	submitHandler: function(form) {	
+	
+		$.ajax({
+			url: base_url+''+uri_1+'/add_data_finish_design',
+			type:'POST',
+			dataType:'json',
+			data: $('#form_finish_design').serialize(),
+			beforeSend: function(){	
+				$('#loading_finish_design').show();
+			},
+			success: function(data){
+				location.reload();
+			},
+			error : function(data) {
+				alert(data);
+				$('#loading_finish_design').hide();
+				$('#pesan_error_finish_design').html('maaf telah terjadi kesalahan dalam program, silahkan anda mengakses halaman lainnya.');
+			}
+		})
+	}	
+});
+
+
+
+
 $('#form_harga_barang').validate({
 	submitHandler: function(form) {	
 	
@@ -133,9 +159,14 @@ $('#form_harga_barang').validate({
 	}
 	
 });
-
+/**
 function keterangan_alur_order(){
 	$('.main-footer').append('<div class="modal fade" id="container-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="false"><div class="modal-dialog" role="document"><div class="modal-content"><div class="modal-header"><h4 class="modal-title" id="myModalLabel">Pesan Konfirmasi</h4></div><div class="modal-body"><ul>Jika anda memilih Kasir, maka WO akan dilanjutkan langsung menuju halaman menu kasir.<br>Contoh jika customer membeli Alat Banner saja.</ul><ol>Jika anda memilih OP Print &#10132; Kasir, maka WO akan dilanjutkan ke menu Operator Print. Setelah itu dari menu Operator Print dapat diteruskan menuju halaman menu kasir.<br>contoh : jika customer/pelanggan hanya membeli jasa Cetak tanpa proses Desain.</ol><ol>Jika anda memilih OP Grafis &#10132; Kasir, maka WO akan dilanjutkan ke menu Operator Grafis. Setelah itu dari menu Operator Grafis dapat diteruskan menuju halaman menu kasir.<br>contoh : jika customer/pelanggan hanya membeli jasa Desain tanpa proses printing.</ol><ol>Jika anda memilih OP Grafis &#10132; OP Print &#10132; Kasir, maka WO akan dilanjutkan ke menu Operator Grafis. Setelah itu dari menu Operator Grafis dapat diteruskan menuju halaman menu Operator Print.  Dari Operator Print dapat Diteruskan ke Kasir jika desain sudah Oke. Namun jika desain ada kesalahan dapat dikembalikan ke Menu Operator Desain.</ol></div><div class="modal-footer"><div class="pull-left"><button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button></div></div></div></div></div>');
+	$('#container-modal').modal('show');
+}**/
+
+function keterangan_alur_order(){
+	$('.main-footer').append('<div class="modal fade" id="container-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="false"><div class="modal-dialog" role="document"><div class="modal-content"><div class="modal-header"><h4 class="modal-title" id="myModalLabel">Pesan Pemberitahuan</h4></div><div class="modal-body"><ol>Jika anda memilih OP Print &#10132; Kasir, maka WO akan dilanjutkan ke menu Operator Print. Setelah itu dari menu Operator Print dapat diteruskan menuju halaman menu kasir.<br>contoh : jika customer/pelanggan hanya membeli jasa Cetak tanpa proses Desain.</ol><ol>Jika anda memilih OP Grafis &#10132; OP Print &#10132; Kasir, maka WO akan dilanjutkan ke menu Operator Grafis. Setelah itu dari menu Operator Grafis dapat diteruskan menuju halaman menu Operator Print.  Dari Operator Print dapat Diteruskan ke Kasir jika desain sudah Oke. Namun jika desain ada kesalahan dapat dikembalikan ke Menu Operator Desain.</ol></div><div class="modal-footer"><div class="pull-left"><button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button></div></div></div></div></div>');
 	$('#container-modal').modal('show');
 }
 
@@ -175,10 +206,34 @@ $("#NAMA_BARANG_AUTOCOMPLETE").autocomplete({
 		
 		$("#JUMLAH_QTY_FORM").focus();
 		$("#ID_BARANG_FORM").val(ui.item.id_barang);
-		$("#satuan_barang").html("<h5>"+ui.item.satuan_barang+"</h5>");
-		$("#INPUT_SATUAN_BARANG").val(ui.item.satuan_barang);
+		$("#SATUAN_BARANG_FORM").val(ui.item.satuan_barang);
 	}
 });
+
+
+function tambah_barang(){
+	
+		$('#tabel_op_grafis').append('<tr id="tr_barang_'+$('#id_barang_grafis').val()+'">   <td>     <input type="hidden" name="ID_BARANG_GRAFIS[]" value="'+$('#id_barang_grafis').val()+'">  <input type="hidden" name="NAMA_BARANG_'+$('#id_barang_grafis').val()+'" value="'+$('#NAMA_BARANG_AUTOCOMPLETE').val()+'"> <input type="hidden" name="JUMLAH_QTY_'+$('#id_barang_grafis').val()+'" value="'+$('#JUMLAH_QTY_FORM').val()+'"> <input type="hidden" name="SATUAN_BARANG_'+$('#id_barang_grafis').val()+'" value="'+$('#SATUAN_BARANG_FORM').val()+'">    <input type="hidden" name="HARGA_QTY_'+$('#id_barang_grafis').val()+'" value="'+$('#HARGA_QTY_FORM').val()+'">    <input type="hidden" name="TOTAL_QTY_'+$('#id_barang_grafis').val()+'" value="'+$('#TOTAL_QTY_FORM').val()+'">                                                                                                                                                                                                                                                                      '+$('#NAMA_BARANG_AUTOCOMPLETE').val()+'</td><td>'+$('#JUMLAH_QTY_FORM').val()+'</td><td>'+$('#SATUAN_BARANG_FORM').val()+'</td><td  class="text-center" ><i class="fa fa-trash text-danger" onclick="hapus_barang('+$('#id_barang_grafis').val()+')"></i></td></tr>');
+		
+		//$('#tabel_op_grafis').append('<tr id="tr_barang_'+$('#id_kerja_grafis').val()+'"><td><input type="hidden" name="nama_barang[]" value="'+$('#NAMA_BARANG_AUTOCOMPLETE').val()+'">'+$('#NAMA_BARANG_AUTOCOMPLETE').val()+'</td><td>'+$('#JUMLAH_QTY_FORM').val()+'</td><td>'+$('#SATUAN_BARANG_FORM').val()+'</td><td  class="text-center" ><i class="fa fa-trash text-danger" onclick="hapus_barang('+$('#id_barang_grafis').val()+')"></i></td></tr>');
+		
+		var newId = parseInt($('#id_barang_grafis').val()) + 1;
+		$('#id_barang_grafis').val(newId);
+		
+		$('#NAMA_BARANG_AUTOCOMPLETE').val('');
+		$('#JUMLAH_QTY_FORM').val('');
+		$('#SATUAN_BARANG_FORM').val('');
+		$('#NAMA_BARANG_AUTOCOMPLETE').focus();
+		
+
+}
+function hapus_barang(id){
+	//alert(id);
+	$("#tr_barang_" + id).remove();
+}
+
+
+
 
 function jenis_harga(){
 	if($('#JENIS_HARGA').val()=='SAMA'){		
@@ -209,6 +264,7 @@ function search_member(){
 					$('#ALAMAT_CUSTOMER').val(data.alamat);
 					
 					$('#ID_CUSTOMER').val(data.id_customer);
+					$('#LOG_MEMBER').val('Y');
 					
 					$('#NAMA_CUSTOMER').prop('readonly', true);
 					$('#ALAMAT_CUSTOMER').prop('readonly', true);
@@ -220,6 +276,7 @@ function search_member(){
 					$('#NAMA_CUSTOMER').prop('readonly', false);
 					$('#ALAMAT_CUSTOMER').prop('readonly', false);
 					$('#ID_CUSTOMER').val('');
+					$('#LOG_MEMBER').val('N');
 				}
 			}
 		})
@@ -238,12 +295,11 @@ function hitung_harga_barang(){
 		success: function(data){
 			if(data.status){
 				
-				var total = parseInt($('#JUMLAH_QTY_FORM').val()) *  parseInt(data.harga_qty);			
+				var total = parseInt($('#JUMLAH_QTY_FORM').val()) *  parseInt(data.harga_qty);				
 				
-				$('#TOTAL_HARGA_FORM').val(total);
+				$('#HARGA_QTY_FORM').val(data.harga_qty);
+				$('#TOTAL_QTY_FORM').val(total);
 				
-				$('#HARGA_SATUAN_FORM').val(data.harga_qty);
-				$('#harga_barang').html("<h4> Harga Satuan = "+toRp(data.harga_qty)+" </h4><h3> Total Harga = "+toRp(total) +"</h3>");
 			}
 			else{
 				alert('Not Found !');
@@ -265,44 +321,6 @@ function hilang_jumlah_barang_form(){
 }
 
 
-
-function tambah_barang(){
-	if($('#NAMA_BARANG_AUTOCOMPLETE').val() == ''){
-		
-		alert('Anda belum memilih barang');
-		$('#NAMA_BARANG_AUTOCOMPLETE').focus();
-	}
-	else if($('#JUMLAH_QTY_FORM').val() == '' ){
-		
-		alert('Anda belum mementukan Jumlah barang');
-		$('#JUMLAH_QTY_FORM').focus();
-	}
-	else{
-		$('#tabel_barang').append('<tr id="tr_'+$('#TOTAL_HARGA_FORM').val()+'"><td>'+$('#NAMA_BARANG_AUTOCOMPLETE').val()+'</td><td>'+$('#JUMLAH_QTY_FORM').val()+' '+$('#INPUT_SATUAN_BARANG').val()+' </td><td>'+toRp($('#HARGA_SATUAN_FORM').val())+'</td><td>'+toRp($('#TOTAL_HARGA_FORM').val())+'</td><td  class="text-center" ><i class="fa fa-trash text-danger" onclick="hapus_barang('+$('#TOTAL_HARGA_FORM').val()+')"></i><input type="hidden" name="id_barang[]" value="'+$('#ID_BARANG_FORM').val()+'"><input type="hidden" name="jumlah_qty_'+$('#ID_BARANG_FORM').val()+'" value="'+$('#JUMLAH_QTY_FORM').val()+'"><input type="hidden" name="harga_qty_'+$('#ID_BARANG_FORM').val()+'" value="'+$('#HARGA_SATUAN_FORM').val()+'"><input type="hidden" name="total_harga_'+$('#ID_BARANG_FORM').val()+'" value="'+$('#TOTAL_HARGA_FORM').val()+'"></td></tr>');
-		$('#NAMA_BARANG_AUTOCOMPLETE').val('');
-		
-		var total_bayar_akhir = parseInt($('#total_bayar').val()) +  parseInt($('#TOTAL_HARGA_FORM').val());
-		$('#total_bayar').val(total_bayar_akhir);
-		$('#rp_total_bayar').html("<h4>"+toRp($('#total_bayar').val())+"</h4>");
-		
-		hilang_jumlah_barang_form();	
-		
-	}
-	
-	
-	
-}
-
-
-function hapus_barang(jumlah){
-	$("#tr_" + jumlah).remove();
-	
-	var total_bayar_akhir = parseInt($('#total_bayar').val()) -  parseInt(jumlah);
-	$('#total_bayar').val(total_bayar_akhir);
-	$('#rp_total_bayar').html("<h4>"+toRp($('#total_bayar').val())+"</h4>");
-}
-
-
 function hitung_discount(){
 	
 	
@@ -312,3 +330,28 @@ function hitung_discount(){
 	$('#TOTAL_BAYAR').val(totalBayar);
 	$('#total_bayar_rp').html(toRp(totalBayar));
 }
+
+function ganti_harga_jumlah_kasir(id,jumlah_barang){ 
+	
+	var total = parseInt($('#JUMLAH_QTY_'+id).val()) * parseInt($('#HARGA_SATUAN_'+id).val());	
+	$('#TOTAL_HARGA_'+id).val(total);
+	
+	var total_harga =  0 ;
+	for (i = 1; i <= jumlah_barang; i++) {		
+		var harga = parseInt($('#TOTAL_HARGA_'+i).val());		
+		total_harga +=  harga;		
+		
+	} 
+	
+	$('#harga_total').val(total_harga);
+	$('#text_harga_total').html(toRp(total_harga));
+	
+	
+	$('#TOTAL_BAYAR').val(total_harga);
+	$('#total_bayar_rp').html(toRp(total_harga));
+	
+	
+}
+
+
+

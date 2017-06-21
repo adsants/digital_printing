@@ -23,7 +23,7 @@ class Order extends CI_Controller {
 	
 		$jumlahIdBarang = count($this->input->post('id_barang'));
 	//	var_dump($jumlahIdBarang);
-		if(    $jumlahIdBarang > 0   ){
+		//if(    $jumlahIdBarang > 0   ){
 			
 			if($this->input->post('ID_CUSTOMER') == ''){
 			
@@ -43,38 +43,28 @@ class Order extends CI_Controller {
 				$idCustomer = $this->input->post('ID_CUSTOMER');
 			}
 			
-			///////
-			if( $this->input->post('JENIS_ORDER') =='4'){
-				$posisiOrder = 'KASIR';
-			}
-			elseif($this->input->post('JENIS_ORDER') =='3'){
-				$posisiOrder = 'OP-PRINT';
-			}
-			else{
-				$posisiOrder = 'OP-GRAFIS';
-			}
 			
 			////// input t_order
 			$maxIDOrder = $this->t_order_model->getPrimaryKeyMax();
 			$idOrder = $maxIDOrder->MAX + 1;
 			
-			$no_order = date('ymdHis');
+			$maxIDOrderToday = $this->t_order_model->getPrimaryKeyMaxToday();
+			$NoOrder = $maxIDOrderToday->MAX + 1;
+			
 			
 			$data = array(					
 				'ID_ORDER' 		=> 	$idOrder,			
 				'ID_CUSTOMER'	=> 	$idCustomer	,			
-				'POSISI_ORDER' 	=> 	$posisiOrder,			
-				'JENIS_ORDER' 	=>  $this->input->post('JENIS_ORDER')	,			
-				'NO_ORDER' 	=>  $no_order	,
-				'ID_KARYAWAN' 		=> $this->session->userdata('id_karyawan')	,						
-				'CATATAN' 		=> 	$this->input->post('CATATAN')				
+				'POSISI_ORDER' 	=> 	'OP-GRAFIS',
+				'STATUS_BAYAR'	=> 'BL',
+				'NO_ORDER'		=> $NoOrder,
+				'LOG_MEMBER'	=> $this->input->post('LOG_MEMBER')
 			);
 			$this->db->set('TGL_ORDER', 'NOW()', FALSE);
-			$this->db->set('TGL_AMBIL', 'NOW()', FALSE);
 			$query = $this->t_order_model->insert($data);
 			
 			
-			foreach($this->input->post('id_barang') as $id_barang){
+			/* foreach($this->input->post('id_barang') as $id_barang){
 				$this->db->query("				
 				insert into t_barang_order 
 					(
@@ -82,7 +72,8 @@ class Order extends CI_Controller {
 						ID_ORDER,
 						JUMLAH_QTY,
 						HARGA_SATUAN,
-						TOTAL_HARGA
+						TOTAL_HARGA,
+						
 					)
 					values
 					(
@@ -95,24 +86,24 @@ class Order extends CI_Controller {
 					
 				");
 				
-			}
+			} */
 			
 			///// input Log WO
 			$data = array(					
 				'ID_ORDER' 			=> $idOrder	,			
 				'ID_KARYAWAN' 		=> $this->session->userdata('id_karyawan')	,			
-				'CATATAN_LOG_ORDER' => '',			
-				'DARI' 				=>  'CS',			
-				'KE' 				=> $posisiOrder			
+				'CATATAN_LOG_ORDER' => $this->input->post('CATATAN_LOG_ORDER')	,		
+				'KE' 				=> 'OP-GRAFIS'	,		
+				'DARI' 				=>  'CS'	
 			);
 			$this->db->set('TGL_LOG_ORDER', 'NOW()', FALSE);
 			$query = $this->t_log_order_model->insert($data);
 			
-			$status = array('status' => true , 'redirect_link' => base_url()."".$this->uri->segment(1) , 'pesan_modal' => '<b>Input Work Order berhasil disimpan.</b><br><b>No WO adalah <h3>'.$no_order.'</h3></b>');
-		}
-		else{
-			$status = array('status' => false , 'pesan' => 'Proses simpan gagal, anda belum input barang !');
-		}
+			$status = array('status' => true , 'redirect_link' => base_url()."".$this->uri->segment(1) , 'pesan_modal' => '<b>Input Order berhasil disimpan.</b><h3>No Order : '.$NoOrder.'</h3>');
+		//}
+		//else{
+		//	$status = array('status' => false , 'pesan' => 'Proses simpan gagal, anda belum input barang !');
+	//	}
 		
 		echo(json_encode($status));
 	}

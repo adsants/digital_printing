@@ -54,7 +54,8 @@
             <thead>
               <tr>
                 <th colspan="2" width="15%" class="text-right">No.</th>
-                <th class="text-center">No WO</th>
+                <th class="text-center">Member</th>
+                <th width="10%" class="text-center">No Order</th>
                 <th class="text-center">Tgl Order</th>
               </tr>
             </thead>
@@ -69,6 +70,11 @@
 						<a href="<?=base_url();?><?php echo $this->uri->segment('1');?>/proses/<?php echo $showData->ID_ORDER; ?>"><span class="btn btn-success btn-sm">Proses</span>
 					</td>
 					<td align="center"><?php echo $no; ?>.</td>
+					<td >
+					<?php
+					echo ($showData->LOG_MEMBER == 'Y' ? 'Member' : 'Bukan');
+					?>
+					</td>
 					<td ><?php echo $showData->NO_ORDER; ?></td>
 					<td ><?php echo $showData->TGL_ORDER; ?></td>
 				</tr>

@@ -13,6 +13,10 @@ class T_bayar_order_model extends CI_Model {
 		return $this->db->get("t_bayar_order")->result();
 	}
 	
+	function getPrimaryKeyMax($idOrder){
+		$query = $this->db->query("select max(ID_T_BAYAR_ORDER) as MAX from t_bayar_order where id_order='".$idOrder."'") ;	
+		return $query->row();
+	}
 	
 	function insert($data){
 		$this->db->insert('t_bayar_order', $data);	

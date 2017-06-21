@@ -9,19 +9,31 @@ class T_barang_order_model extends CI_Model {
 	
 	
 	
-	function showData($where){
-		$this->db->select("m_barang.ID_BARANG");		
-		$this->db->select("m_barang.NAMA_BARANG");		
-		$this->db->select("m_barang.SATUAN");		
+	function showData($where){	
+		$this->db->select("t_barang_order.NAMA_BARANG");		
+		$this->db->select("t_barang_order.SATUAN_BARANG");		
 		$this->db->select("t_barang_order.JUMLAH_QTY");		
 		$this->db->select("t_barang_order.HARGA_SATUAN");		
+		$this->db->select("t_barang_order.COUNT_BARANG");		
 		$this->db->select("t_barang_order.TOTAL_HARGA");		
 		$this->db->where($where);	
 		
-		$this->db->join('m_barang', 'm_barang.id_barang = t_barang_order.id_barang');	
 		return $this->db->get("t_barang_order")->result();
 	}
-	
+	function getPrimaryKeyMax($idOrder){
+		$query = $this->db->query("select max(count_barang) as MAX from t_barang_order where id_order='".$idOrder."'") ;	
+		return $query->row();
+	}
+	function getCount($where = null,$like = null,$order_by = null,$limit = null, $fromLimit=null){
+		$this->db->select("*");		
+		if($where){
+			$this->db->where($where);
+		}		
+		if($like){
+			$this->db->like($like);
+		}
+		return $this->db->get("t_barang_order")->num_rows();
+	}
 	
 	function insert($data){
 		$this->db->insert('t_barang_order', $data);	

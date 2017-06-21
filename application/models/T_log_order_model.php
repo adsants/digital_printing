@@ -9,7 +9,10 @@ class T_log_order_model extends CI_Model {
 	
 	function showData($where){
 		$this->db->select("m_karyawan.NAMA_KARYAWAN");				
-		$this->db->select("t_log_order.*");				
+		$this->db->select("t_log_order.DARI");				
+		$this->db->select("t_log_order.KE");				
+		$this->db->select("t_log_order.CATATAN_LOG_ORDER");				
+		$this->db->select('DATE_FORMAT(t_log_order.tgl_log_order, "%Y-%m-%d %h:%i") as TGL_LOG_ORDER', FALSE);			
 		$this->db->order_by("t_log_order.tgl_log_order");				
 		$this->db->where($where);	
 		

@@ -45,6 +45,8 @@ class Kasir extends CI_Controller {
 		
 		$this->dataBarang  = $this->t_barang_order_model->showData($where);	
 		
+		$this->jumlahBarang  = $this->t_barang_order_model->getCount($where);	
+		
 		$this->logAlur  = $this->t_log_order_model->showData($where);	
 		
 		if($this->oldData){
@@ -57,52 +59,82 @@ class Kasir extends CI_Controller {
 	}
 	
 	public function proses_data(){
-			if($this->input->post('DARI')==''){
-				$data = array(					
-					'TOTAL_BAYAR' 			=> $this->input->post('TOTAL_BAYAR')	,		
-					'DISCOUNT' 			=> $this->input->post('DISCOUNT')		
-				);			
-				$where  = array('ID_ORDER' => $this->input->post('ID_ORDER'));
-				$query = $this->t_order_model->update($where,$data);
-				$status = array('status' => true,'pesan_modal' => 'Data berhasil disimpan.. silahkan proses WO untuk mencetak Nota.','redirect_link' => base_url()."".$this->uri->segment(1)."/proses/". $this->input->post('ID_ORDER') );
-			}
-			else{
-				
-				$dataUpdate = array(					
-					'STATUS_BAYAR' 			=> $this->input->post('STATUS_BAYAR'),
-					'POSISI_ORDER' 	=> 	$this->input->post('KE')	
-				);			
-				$where  = array('ID_ORDER' => $this->input->post('ID_ORDER'));
-				$query = $this->t_order_model->update($where,$dataUpdate);
-				
-				
-				///// input Log WO
-				$data = array(					
-					'ID_ORDER' 			=> $this->input->post('ID_ORDER')	,		
-					'ID_KARYAWAN' 		=> $this->session->userdata('id_karyawan')	,			
-					'CATATAN_LOG_ORDER' => $this->input->post('CATATAN')	,		
-					'DARI' 				=>  $this->input->post('DARI'),			
-					'KE' 				=> $this->input->post('KE')		
-				);
-				$this->db->set('TGL_LOG_ORDER', 'NOW()', FALSE);
-				$query = $this->t_log_order_model->insert($data);
-				
-				
-				$dataBayar = array(								
-					'JENIS_BAYAR' 	=> 	$this->input->post('JENIS_BAYAR')	,
-					'JUMLAH_BAYAR' 	=> 	$this->input->post('TOTAL_BAYAR')	
-					
-				);
-				$this->db->set('TGL_BAYAR', 'NOW()', FALSE);
-				$query = $this->t_bayar_order_model->insert($dataBayar);
-				
-				$status = array('status' => true,'pesan_modal' => 'Data berhasil disimpan.. anda dapat mencetak Nota.','redirect_link' => base_url()."".$this->uri->segment(1)."/proses/". $this->input->post('ID_ORDER') );
-			}
+			
+		$data = array(					
+			'TOTAL_BAYAR' 			=> $this->input->post('TOTAL_BAYAR')	,		
+			'DISCOUNT' 			=> $this->input->post('DISCOUNT')		
+		);			
+		$where  = array('ID_ORDER' => $this->input->post('ID_ORDER'));
+		$query = $this->t_order_model->update($where,$data);	
+		
+		
+		
+		//// input ulang barang
+		
+		$whereDelete = array('id_order' => $this->input->post('ID_ORDER'));
+		$delete = $this->t_barang_order_model->delete($whereDelete);
+		
+		foreach($this->input->post('ID_BARANG') as $ID_BARANG_GRAFIS){
+			
+			$maxCountBarang = $this->t_barang_order_model->getPrimaryKeyMax($this->input->post('ID_ORDER'));
+			$newId = $maxCountBarang->MAX + 1;	
 			
 			
+			$this->db->query("				
+			insert into t_barang_order 
+				(
+					COUNT_BARANG,
+					ID_ORDER,
+					NAMA_BARANG,
+					JUMLAH_QTY,
+					SATUAN_BARANG,
+					HARGA_SATUAN,
+					TOTAL_HARGA						
+				)
+				values
+				(
+					'".$newId."',
+					'".$this->input->post('ID_ORDER')."',
+					'".$this->input->post('NAMA_BARANG_'.$ID_BARANG_GRAFIS)."',
+					'".$this->input->post('JUMLAH_QTY_'.$ID_BARANG_GRAFIS)."',
+					'".$this->input->post('SATUAN_BARANG_'.$ID_BARANG_GRAFIS)."',
+					'".$this->input->post('HARGA_SATUAN_'.$ID_BARANG_GRAFIS)."',
+					'".$this->input->post('TOTAL_HARGA_'.$ID_BARANG_GRAFIS)."'						
+				)
+				
+			");
+			
+		}
+		
+		$whereDeleteBayar = array('id_order' => $this->input->post('ID_ORDER'));
+		$delete = $this->t_bayar_order_model->delete($whereDeleteBayar);
+		
+		
+		$dataOrder = array(								
+			'POSISI_ORDER' 	=> 	'FINISH'		
+		);
+		$where = array('id_order' =>	$this->input->post('ID_ORDER'));
+		$query = $this->t_order_model->update($where ,$dataOrder);
+		
+		
+		$idBayar 	= $this->t_bayar_order_model->getPrimaryKeyMax($this->input->post('ID_ORDER'));
+		//echo $this->db->last_query();
+		$newIdBayar	= $idBayar->MAX + 1;		
+		
+		$dataBayar = array(								
+			'ID_T_BAYAR_ORDER' 	=> 	$newIdBayar	,
+			'JENIS_BAYAR' 		=> 	$this->input->post('JENIS_BAYAR')	,
+			'ID_ORDER' 			=> 	$this->input->post('ID_ORDER')	,
+			'JUMLAH_BAYAR' 		=> 	$this->input->post('TOTAL_BAYAR')	
+			
+		);
+		$this->db->set('TGL_BAYAR', 'NOW()', FALSE);
+		$query = $this->t_bayar_order_model->insert($dataBayar);
+		
+		$status = array('status' => true,'pesan_modal' => 'Data berhasil disimpan.. silahkan proses WO untuk mencetak Nota.','redirect_link' => base_url()."".$this->uri->segment(1)."/proses/". $this->input->post('ID_ORDER') );
 			
 			
-			echo(json_encode($status));
+		echo(json_encode($status));
 	}
 	
 }

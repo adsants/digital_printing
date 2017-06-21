@@ -12,7 +12,7 @@ class Grafis extends CI_Controller {
 
 	public function index(){		
 		$like 		= null;
-		$order_by 	= 'tgl_order'; 
+		$order_by 	= 'no_order'; 
 		$urlSearch 	= null;
 		
 		$where  = array('t_order.POSISI_ORDER' => 'OP-GRAFIS');
@@ -61,18 +61,79 @@ class Grafis extends CI_Controller {
 			$data = array(					
 				'ID_ORDER' 			=> $this->input->post('ID_ORDER')	,		
 				'ID_KARYAWAN' 		=> $this->session->userdata('id_karyawan')	,			
-				'CATATAN_LOG_ORDER' => $this->input->post('CATATAN')	,		
-				'DARI' 				=>  $this->input->post('DARI'),			
-				'KE' 				=> $this->input->post('KE')		
+				'CATATAN_LOG_ORDER' => 'Ke Proses Pembayaran'	,		
+				'DARI' 				=> 'OP-GRAFIS',			
+				'KE' 				=> 'KASIR'	
 			);
 			$this->db->set('TGL_LOG_ORDER', 'NOW()', FALSE);
 			$query = $this->t_log_order_model->insert($data);
 			
 			
+			
+			//// input barang
+			foreach($this->input->post('ID_BARANG_GRAFIS') as $ID_BARANG_GRAFIS){
+				
+				$maxCountBarang = $this->t_barang_order_model->getPrimaryKeyMax($this->input->post('ID_ORDER'));
+				$newId = $maxCountBarang->MAX + 1;	
+				
+				
+				$this->db->query("				
+				insert into t_barang_order 
+					(
+						COUNT_BARANG,
+						ID_ORDER,
+						NAMA_BARANG,
+						JUMLAH_QTY,
+						SATUAN_BARANG,
+						HARGA_SATUAN,
+						TOTAL_HARGA						
+					)
+					values
+					(
+						'".$newId."',
+						'".$this->input->post('ID_ORDER')."',
+						'".$this->input->post('NAMA_BARANG_'.$ID_BARANG_GRAFIS)."',
+						'".$this->input->post('JUMLAH_QTY_'.$ID_BARANG_GRAFIS)."',
+						'".$this->input->post('SATUAN_BARANG_'.$ID_BARANG_GRAFIS)."',
+						'".$this->input->post('HARGA_QTY_'.$ID_BARANG_GRAFIS)."',
+						'".$this->input->post('TOTAL_QTY_'.$ID_BARANG_GRAFIS)."'						
+					)
+					
+				");
+				
+			}
+			
+			$noWO =   date('dmy').'-'.$this->input->post('NO_ORDER');
+			//////  update posisi order
 			$dataOrder = array(								
-				'POSISI_ORDER' 	=> 	$this->input->post('KE')				
+				'POSISI_ORDER' 	=> 	'KASIR',
+				'NO_WO' 		=>	$noWO				
 			);
-			$where = array('id_order' =>$this->input->post('ID_ORDER'));
+			$where = array('id_order' =>	$this->input->post('ID_ORDER'));
+			$query = $this->t_order_model->update($where ,$dataOrder);
+			
+			$status = array('status' => true ,'pesan_modal' => '<h3>Work Order berhasil disimpan dengan Nomor Wo :  '.$noWO.'</h3>');
+			
+			echo(json_encode($status));
+	}
+	
+	function add_data_finish_design(){
+		///// input Log WO
+			$data = array(					
+				'ID_ORDER' 			=> $this->input->post('id_order_finish_design')	,		
+				'ID_KARYAWAN' 		=> $this->session->userdata('id_karyawan')	,			
+				'CATATAN_LOG_ORDER' => $this->input->post('keterangan_finish_design')	,		
+				'DARI' 				=> 'OP-GRAFIS',			
+				'KE' 				=> 'FINISH-DESIGN'	
+			);
+			$this->db->set('TGL_LOG_ORDER', 'NOW()', FALSE);
+			$query = $this->t_log_order_model->insert($data);
+			
+		//////  update posisi order
+			$dataOrder = array(								
+				'POSISI_ORDER' 	=> 	'FINISH-DESIGN'			
+			);
+			$where = array('id_order' =>	$this->input->post('id_order_finish_design'));
 			$query = $this->t_order_model->update($where ,$dataOrder);
 			
 			$status = array('status' => true );

@@ -1,5 +1,10 @@
 <link rel="stylesheet" href="<?=base_url();?>assets/bootstrap/css/bootstrap.min.css">
-
+<style>
+	body{
+		font-size:10px;
+		}
+</style>
+<body>
 <table width="100%" style="border-collapse:collapse;    border: 1px solid #ddd;" border="1" >
 <tr valign="top">
 <td width="40%" valign="top">
@@ -7,7 +12,7 @@
 	
 	<tr>
 		
-		<td align=""><h3>&nbsp;<b><?php echo $this->oldData->NO_ORDER; ?></b></h3></td>
+		<td align=""><h3>&nbsp;<b><?php echo $this->oldData->NO_WO; ?></b></h3></td>
 	</tr>
 	<tr>
 		
@@ -40,9 +45,9 @@
 <table class="table table-bordered">
 	<tr>
 		<th width="45%" align="center">Barang</th>
-		<th width="15%" align="center">Jumlah Qty</th>
-		<th width="20%" align="center">Harga Qty</th>
-		<th width="25%" align="center">Total</th>
+		<th width="15%" align="center">Quantity</th>
+		<th width="20%" align="center">Harga Satuan</th>
+		<th width="25%" align="center">Jumlah</th>
 	</tr>
 	<?php 
 	
@@ -52,7 +57,7 @@
 	?>
 	<tr>
 		<td><?php echo $showBarang->NAMA_BARANG; ?></td>
-		<td><?php echo $showBarang->JUMLAH_QTY; ?> <?php echo $showBarang->SATUAN; ?></td>
+		<td><?php echo $showBarang->JUMLAH_QTY; ?> <?php echo $showBarang->SATUAN_BARANG; ?></td>
 		<td><?php echo format_rupiah($showBarang->HARGA_SATUAN); ?></td>
 		<td><?php echo format_rupiah($showBarang->TOTAL_HARGA); ?></td>
 	</tr>
@@ -67,7 +72,7 @@
 	}
 	?>
 	<tr>
-		<td colspan="2" align="right">Harga Total</td>
+		<td colspan="2" align="right">Sub Total</td>
 		<td colspan="2" align="center"><?php echo format_rupiah($hargaTotal); ?></td>
 	</tr>
 	
@@ -77,13 +82,13 @@
 		
 	</tr>					
 	<tr>
-		<td colspan="2" align="right">Total Bayar</td>
+		<td colspan="2" align="right">Total</td>
 		<td colspan="2" align="center"><?php echo format_rupiah($this->oldData->TOTAL_BAYAR); ?></td>
 	</tr>	
 
 
 </table>
 					
-
+</body>
   
 <script>window.print();</script>

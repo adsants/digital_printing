@@ -10,8 +10,10 @@ class T_order_model extends CI_Model {
 	function showData($where = null,$like = null,$order_by = null,$limit = null, $fromLimit=null){
 		
 		$this->db->select("t_order.NO_ORDER");		
+		$this->db->select("t_order.NO_WO");		
 		$this->db->select("t_order.ID_ORDER");		
 		$this->db->select("t_order.TGL_ORDER");		
+		$this->db->select("t_order.LOG_MEMBER");		
 		$this->db->select("m_customer.NAMA_CUSTOMER");		
 		if($where){
 			$this->db->where($where);
@@ -40,12 +42,13 @@ class T_order_model extends CI_Model {
 	
 	function getData($where){
 		$this->db->select("t_order.NO_ORDER");		
+		$this->db->select("t_order.NO_WO");		
 		$this->db->select("t_order.ID_ORDER");		
 		$this->db->select("t_order.DISCOUNT");		
-		$this->db->select("t_order.CATATAN");		
-		$this->db->select("t_order.TOTAL_BAYAR");		
-		$this->db->select("t_order.JENIS_BAYAR");		
-		$this->db->select("t_order.JENIS_ORDER");		
+		$this->db->select("t_order.TGL_AMBIL");			
+		$this->db->select("t_order.TOTAL_BAYAR");			
+		$this->db->select("t_order.STATUS_BAYAR");			
+		$this->db->select("t_order.LOG_MEMBER");			
 		$this->db->select("t_order.TGL_ORDER");		
 		$this->db->select("t_order.POSISI_ORDER");		
 		$this->db->select("m_customer.NAMA_CUSTOMER");	
@@ -60,6 +63,10 @@ class T_order_model extends CI_Model {
 	
 	function getPrimaryKeyMax(){
 		$query = $this->db->query('select max(id_order) as MAX from t_order') ;	
+		return $query->row();
+	}
+	function getPrimaryKeyMaxToday(){
+		$query = $this->db->query('select max(no_order) as MAX from t_order where DATE(tgl_order) = CURDATE()') ;	
 		return $query->row();
 	}
 	
